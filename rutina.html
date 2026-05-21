@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rutina — Plan Intensivo</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #181818;
+    --accent: #c8f135;
+    --accent2: #f1c835;
+    --text: #f0f0f0;
+    --muted: #666;
+    --border: #222;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+  }
+
+  header {
+    text-align: center;
+    padding: 32px 0 40px;
+    position: relative;
+  }
+
+  .tag {
+    display: inline-block;
+    background: var(--accent);
+    color: #000;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 12vw, 88px);
+    line-height: 0.9;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #f0f0f0 0%, #888 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 13px;
+    letter-spacing: 1px;
+    margin-top: 12px;
+  }
+
+  /* Day tabs */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 24px;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab {
+    flex-shrink: 0;
+    padding: 8px 18px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab:hover { border-color: #444; color: var(--text); }
+  .tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+    font-weight: 500;
+  }
+  .tab.rest { }
+  .tab.rest.active {
+    background: var(--surface2);
+    border-color: #444;
+    color: var(--text);
+  }
+
+  /* Day panel */
+  .day-panel { display: none; }
+  .day-panel.active { display: block; }
+
+  .day-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 12px;
+  }
+
+  .day-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+
+  .day-badge {
+    flex-shrink: 0;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .badge-upper { background: #1a2a0a; color: var(--accent); border: 1px solid #2a4a10; }
+  .badge-lower { background: #1a1a2a; color: #8ab4f8; border: 1px solid #2a2a4a; }
+  .badge-rest { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+
+  /* Blocks */
+  .block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .block-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .block-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  .block-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 1px;
+  }
+
+  .block-note {
+    font-size: 11px;
+    color: var(--muted);
+    margin-left: auto;
+    text-align: right;
+  }
+
+  /* Exercise rows */
+  .exercise {
+    display: flex;
+    align-items: center;
+    padding: 13px 20px;
+    border-bottom: 1px solid #161616;
+    gap: 12px;
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+  .exercise:last-child { border-bottom: none; }
+  .exercise:hover { background: var(--surface2); }
+  .exercise.done { opacity: 0.4; }
+  .exercise.done .ex-name { text-decoration: line-through; }
+
+  .ex-check {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 10px;
+  }
+  .exercise.done .ex-check {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+  }
+
+  .ex-name {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  .ex-sets {
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* Rest day */
+  .rest-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 24px;
+    text-align: center;
+  }
+  .rest-emoji { font-size: 48px; margin-bottom: 16px; }
+  .rest-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .rest-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+  /* Morning cardio card */
+  .cardio-card {
+    background: linear-gradient(135deg, #111a05 0%, #0d1a0d 100%);
+    border: 1px solid #2a3a15;
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .cardio-icon { font-size: 24px; }
+  .cardio-text h3 { font-size: 14px; font-weight: 500; color: var(--accent); margin-bottom: 3px; }
+  .cardio-text p { font-size: 12px; color: #888; line-height: 1.5; }
+
+  /* Progress bar */
+  .progress-bar-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .progress-label span:last-child { color: var(--accent); font-weight: 500; }
+  .progress-track {
+    height: 4px;
+    background: var(--border);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 100px;
+    transition: width 0.4s ease;
+  }
+
+  /* Timer button */
+  .timer-section {
+    text-align: center;
+    padding: 20px 0 0;
+  }
+  .timer-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.15s, opacity 0.15s;
+  }
+  .timer-btn:hover { transform: scale(1.03); }
+  .timer-btn:active { transform: scale(0.97); }
+
+  .timer-display {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    line-height: 1;
+    margin: 12px 0 8px;
+  }
+  .timer-label { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+
+  .timer-controls { display: flex; gap: 10px; justify-content: center; margin-top: 12px; }
+  .t-btn {
+    padding: 8px 20px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .t-btn:hover { background: var(--surface2); }
+  .t-btn.primary { background: var(--accent); color: #000; border-color: var(--accent); }
+
+  /* Week nav */
+  .week-strip {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+  .week-day {
+    flex: 1;
+    text-align: center;
+    padding: 10px 4px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .week-day .wd-name { font-weight: 500; margin-bottom: 4px; }
+  .week-day .wd-num { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--text); }
+  .week-day.today { border-color: var(--accent); background: #111a05; }
+  .week-day.today .wd-num { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="tag">Plan Intensivo · Casa</div>
+  <h1>RUTINA<br>6 DÍAS</h1>
+  <p class="subtitle">Definición · Fuerza · Pantorrillas · Sin equipo</p>
+</header>
+
+<!-- Week strip -->
+<div class="week-strip" id="weekStrip"></div>
+
+<!-- Progress -->
+<div class="progress-bar-wrap">
+  <div class="progress-label">
+    <span>Progreso hoy</span>
+    <span id="progressText">0%</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+</div>
+
+<!-- Day tabs -->
+<div class="tabs">
+  <button class="tab active" onclick="switchDay(0)">Hoy</button>
+  <button class="tab" onclick="switchDay(1)">Lun</button>
+  <button class="tab" onclick="switchDay(2)">Mar</button>
+  <button class="tab" onclick="switchDay(3)">Mié</button>
+  <button class="tab" onclick="switchDay(4)">Jue</button>
+  <button class="tab" onclick="switchDay(5)">Vie</button>
+  <button class="tab" onclick="switchDay(6)">Sáb</button>
+  <button class="tab rest" onclick="switchDay(7)">Dom</button>
+</div>
+
+<!-- Panels -->
+<div id="panels"></div>
+
+<!-- Rest timer -->
+<div class="block" style="margin-top:16px">
+  <div class="block-header">
+    <div class="block-icon" style="background:#1a1a0a">⏱</div>
+    <span class="block-title">Descanso entre series</span>
+  </div>
+  <div style="padding:20px">
+    <div class="timer-display" id="timerDisplay">01:30</div>
+    <div class="timer-label">Descanso recomendado</div>
+    <div class="timer-controls">
+      <button class="t-btn" onclick="setTimer(45)">45s</button>
+      <button class="t-btn" onclick="setTimer(90)">90s</button>
+      <button class="t-btn primary" id="timerToggle" onclick="toggleTimer()">▶ Iniciar</button>
+      <button class="t-btn" onclick="resetTimer()">↺</button>
+    </div>
+  </div>
+</div>
+
+<!-- Morning cardio note -->
+<div style="margin-top:16px; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px 20px;">
+  <p style="font-size:11px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-bottom:8px">Recuerda cada mañana</p>
+  <p style="font-size:13px; line-height:1.7; color:#aaa">🚶 <strong style="color:var(--text)">Cardio en ayunas</strong> — 20 min caminata rápida o trote ligero antes del desayuno, 3-4 días/semana. Ataca grasa directamente con glucógeno bajo.</p>
+  <p style="font-size:13px; line-height:1.7; color:#aaa; margin-top:8px">🌙 <strong style="color:var(--text)">Termina 2h antes de dormir.</strong> Post-entreno: proteína ligera (huevo, atún, yogur). Sin carbos pesados nocturnos.</p>
+</div>
+
+<script>
+const days = [
+  {
+    label: "Hoy — Miércoles",
+    type: "upper",
+    badge: "Tren Superior",
+    badgeClass: "badge-upper",
+    blocks: [
+      {
+        icon: "🔥", title: "Calentamiento", color: "#1a1505",
+        note: "5 min",
+        exercises: [
+          { name: "Jumping jacks", sets: "2 × 30 seg" },
+          { name: "Rotaciones de hombros", sets: "2 × 20" },
+          { name: "Sentadillas lentas", sets: "2 × 10" },
+        ]
+      },
+      {
+        icon: "💪", title: "Circuito Pecho & Brazos", color: "#0a1a05",
+        note: "3-4 rondas · 30-45s descanso",
+        exercises: [
+          { name: "Flexiones estándar", sets: "15–20 reps" },
+          { name: "Flexiones diamante (tríceps)", sets: "12–15 reps" },
+          { name: "Flexiones manos anchas (pecho)", sets: "15 reps" },
+          { name: "Flexiones arqueras", sets: "8 por lado" },
+          { name: "Fondos en silla (tríceps)", sets: "15 reps" },
+          { name: "Flexiones declinadas (pies en silla)", sets: "10–12 reps" },
+        ]
+      },
+      {
+        icon: "🧱", title: "Core", color: "#0a0a1a",
+        note: "3 rondas",
+        exercises: [
+          { name: "Plancha", sets: "45 seg" },
+          { name: "Mountain climbers", sets: "30 seg" },
+          { name: "Elevaciones de piernas", sets: "15 reps" },
+        ]
+      },
+      {
+        icon: "🧘", title: "Estiramiento", color: "#111",
+        note: "5–10 min",
+        exercises: [
+          { name: "Estiramiento de pecho (pared)", sets: "30 seg c/lado" },
+          { name: "Estiramiento de tríceps", sets: "30 seg c/lado" },
+          { name: "Estiramiento de hombros", sets: "30 seg c/lado" },
+        ]
+      }
+    ]
+  },
+  // Lunes - Upper
+  {
+    label: "Lunes",
+    type: "upper",
+    badge: "Tren Superior",
+    badgeClass: "badge-upper",
+    blocks: [
+      { icon:"🔥", title:"Calentamiento", color:"#1a1505", note:"5 min",
+        exercises:[{name:"Jumping jacks",sets:"2 × 30 seg"},{name:"Rotaciones de hombros",sets:"2 × 20"},{name:"Sentadillas lentas",sets:"2 × 10"}]},
+      { icon:"💪", title:"Circuito Pecho & Brazos", color:"#0a1a05", note:"3-4 rondas · 30-45s descanso",
+        exercises:[{name:"Flexiones estándar",sets:"15–20 reps"},{name:"Flexiones diamante",sets:"12–15 reps"},{name:"Flexiones manos anchas",sets:"15 reps"},{name:"Flexiones arqueras",sets:"8 por lado"},{name:"Fondos en silla",sets:"15 reps"},{name:"Flexiones declinadas",sets:"10–12 reps"}]},
+      { icon:"🧱", title:"Core", color:"#0a0a1a", note:"3 rondas",
+        exercises:[{name:"Plancha",sets:"45 seg"},{name:"Mountain climbers",sets:"30 seg"},{name:"Elevaciones de piernas",sets:"15 reps"}]},
+      { icon:"🧘", title:"Estiramiento", color:"#111", note:"5–10 min",
+        exercises:[{name:"Pecho (pared)",sets:"30 seg c/lado"},{name:"Tríceps",sets:"30 seg c/lado"},{name:"Hombros",sets:"30 seg c/lado"}]}
+    ]
+  },
+  // Martes - Lower
+  {
+    label: "Martes",
+    type: "lower",
+    badge: "Tren Inferior",
+    badgeClass: "badge-lower",
+    blocks: [
+      { icon:"🔥", title:"Calentamiento", color:"#1a1505", note:"5 min",
+        exercises:[{name:"Jumping jacks",sets:"2 × 30 seg"},{name:"Círculos de cadera",sets:"2 × 10"},{name:"Estocadas en el lugar",sets:"1 × 10"}]},
+      { icon:"🦵", title:"Circuito Piernas", color:"#050a1a", note:"3-4 rondas · 30-45s descanso",
+        exercises:[{name:"Sentadillas",sets:"20 reps"},{name:"Sentadilla sumo",sets:"15 reps"},{name:"Zancadas alternas",sets:"12 por lado"},{name:"Sentadilla isométrica (aguantar)",sets:"45 seg"},{name:"Saltos de sentadilla",sets:"10 reps"},{name:"Burpees",sets:"10 reps"}]},
+      { icon:"🦶", title:"Pantorrillas (volumen alto)", color:"#0a1505", note:"Puedes hacer esto todos los días",
+        exercises:[{name:"Elevaciones de talón de pie",sets:"4 × 25"},{name:"Elevaciones de talón unilateral",sets:"3 × 20 por pie"},{name:"Elevaciones de talón en escalón",sets:"3 × 20"}]},
+      { icon:"🧘", title:"Estiramiento", color:"#111", note:"5–10 min",
+        exercises:[{name:"Cuádriceps (de pie)",sets:"30 seg c/lado"},{name:"Isquiotibiales",sets:"30 seg c/lado"},{name:"Pantorrillas",sets:"30 seg c/lado"}]}
+    ]
+  },
+  // Miércoles - Upper (same as lunes)
+  {
+    label: "Miércoles",
+    type: "upper",
+    badge: "Tren Superior",
+    badgeClass: "badge-upper",
+    blocks: [
+      { icon:"🔥", title:"Calentamiento", color:"#1a1505", note:"5 min",
+        exercises:[{name:"Jumping jacks",sets:"2 × 30 seg"},{name:"Rotaciones de hombros",sets:"2 × 20"},{name:"Sentadillas lentas",sets:"2 × 10"}]},
+      { icon:"💪", title:"Circuito Pecho & Brazos", color:"#0a1a05", note:"3-4 rondas · 30-45s descanso",
+        exercises:[{name:"Flexiones estándar",sets:"15–20 reps"},{name:"Flexiones diamante",sets:"12–15 reps"},{name:"Flexiones manos anchas",sets:"15 reps"},{name:"Flexiones arqueras",sets:"8 por lado"},{name:"Fondos en silla",sets:"15 reps"},{name:"Flexiones declinadas",sets:"10–12 reps"}]},
+      { icon:"🧱", title:"Core", color:"#0a0a1a", note:"3 rondas",
+        exercises:[{name:"Plancha",sets:"45 seg"},{name:"Mountain climbers",sets:"30 seg"},{name:"Elevaciones de piernas",sets:"15 reps"}]},
+      { icon:"🧘", title:"Estiramiento", color:"#111", note:"5–10 min",
+        exercises:[{name:"Pecho (pared)",sets:"30 seg c/lado"},{name:"Tríceps",sets:"30 seg c/lado"},{name:"Hombros",sets:"30 seg c/lado"}]}
+    ]
+  },
+  // Jueves - Lower
+  {
+    label: "Jueves",
+    type: "lower",
+    badge: "Tren Inferior",
+    badgeClass: "badge-lower",
+    blocks: [
+      { icon:"🔥", title:"Calentamiento", color:"#1a1505", note:"5 min",
+        exercises:[{name:"Jumping jacks",sets:"2 × 30 seg"},{name:"Círculos de cadera",sets:"2 × 10"},{name:"Estocadas en el lugar",sets:"1 × 10"}]},
+      { icon:"🦵", title:"Circuito Piernas", color:"#050a1a", note:"3-4 rondas · 30-45s descanso",
+        exercises:[{name:"Sentadillas",sets:"20 reps"},{name:"Sentadilla sumo",sets:"15 reps"},{name:"Zancadas alternas",sets:"12 por lado"},{name:"Sentadilla isométrica",sets:"45 seg"},{name:"Saltos de sentadilla",sets:"10 reps"},{name:"Burpees",sets:"10 reps"}]},
+      { icon:"🦶", title:"Pantorrillas", color:"#0a1505", note:"Puedes hacer esto todos los días",
+        exercises:[{name:"Elevaciones de talón de pie",sets:"4 × 25"},{name:"Elevaciones de talón unilateral",sets:"3 × 20 por pie"},{name:"Elevaciones de talón en escalón",sets:"3 × 20"}]},
+      { icon:"🧘", title:"Estiramiento", color:"#111", note:"5–10 min",
+        exercises:[{name:"Cuádriceps",sets:"30 seg c/lado"},{name:"Isquiotibiales",sets:"30 seg c/lado"},{name:"Pantorrillas",sets:"30 seg c/lado"}]}
+    ]
+  },
+  // Viernes - Upper
+  {
+    label: "Viernes",
+    type: "upper",
+    badge: "Tren Superior",
+    badgeClass: "badge-upper",
+    blocks: [
+      { icon:"🔥", title:"Calentamiento", color:"#1a1505", note:"5 min",
+        exercises:[{name:"Jumping jacks",sets:"2 × 30 seg"},{name:"Rotaciones de hombros",sets:"2 × 20"},{name:"Sentadillas lentas",sets:"2 × 10"}]},
+      { icon:"💪", title:"Circuito Pecho & Brazos", color:"#0a1a05", note:"3-4 rondas · 30-45s descanso",
+        exercises:[{name:"Flexiones estándar",sets:"15–20 reps"},{name:"Flexiones diamante",sets:"12–15 reps"},{name:"Flexiones manos anchas",sets:"15 reps"},{name:"Flexiones arqueras",sets:"8 por lado"},{name:"Fondos en silla",sets:"15 reps"},{name:"Flexiones declinadas",sets:"10–12 reps"}]},
+      { icon:"🧱", title:"Core", color:"#0a0a1a", note:"3 rondas",
+        exercises:[{name:"Plancha",sets:"45 seg"},{name:"Mountain climbers",sets:"30 seg"},{name:"Elevaciones de piernas",sets:"15 reps"}]},
+      { icon:"🧘", title:"Estiramiento", color:"#111", note:"5–10 min",
+        exercises:[{name:"Pecho",sets:"30 seg c/lado"},{name:"Tríceps",sets:"30 seg c/lado"},{name:"Hombros",sets:"30 seg c/lado"}]}
+    ]
+  },
+  // Sábado - Lower
+  {
+    label: "Sábado",
+    type: "lower",
+    badge: "Tren Inferior",
+    badgeClass: "badge-lower",
+    blocks: [
+      { icon:"🔥", title:"Calentamiento", color:"#1a1505", note:"5 min",
+        exercises:[{name:"Jumping jacks",sets:"2 × 30 seg"},{name:"Círculos de cadera",sets:"2 × 10"},{name:"Estocadas",sets:"1 × 10"}]},
+      { icon:"🦵", title:"Circuito Piernas", color:"#050a1a", note:"3-4 rondas · 30-45s descanso",
+        exercises:[{name:"Sentadillas",sets:"20 reps"},{name:"Sentadilla sumo",sets:"15 reps"},{name:"Zancadas alternas",sets:"12 por lado"},{name:"Sentadilla isométrica",sets:"45 seg"},{name:"Saltos de sentadilla",sets:"10 reps"},{name:"Burpees",sets:"10 reps"}]},
+      { icon:"🦶", title:"Pantorrillas", color:"#0a1505", note:"Puedes hacer esto todos los días",
+        exercises:[{name:"Elevaciones de talón de pie",sets:"4 × 25"},{name:"Elevaciones de talón unilateral",sets:"3 × 20 por pie"},{name:"Elevaciones de talón en escalón",sets:"3 × 20"}]},
+      { icon:"🧘", title:"Estiramiento", color:"#111", note:"5–10 min",
+        exercises:[{name:"Cuádriceps",sets:"30 seg c/lado"},{name:"Isquiotibiales",sets:"30 seg c/lado"},{name:"Pantorrillas",sets:"30 seg c/lado"}]}
+    ]
+  },
+  // Sunday rest
+  {
+    label: "Domingo",
+    type: "rest",
+    badge: "Descanso",
+    badgeClass: "badge-rest",
+    blocks: []
+  }
+];
+
+const panelsEl = document.getElementById('panels');
+const state = {}; // { dayIndex: Set of done exercise keys }
+
+function getKey(dayIdx, blockIdx, exIdx) {
+  return `${dayIdx}-${blockIdx}-${exIdx}`;
+}
+
+function renderPanels() {
+  days.forEach((day, dIdx) => {
+    const div = document.createElement('div');
+    div.className = 'day-panel' + (dIdx === 0 ? ' active' : '');
+    div.id = `panel-${dIdx}`;
+
+    if (day.type === 'rest') {
+      div.innerHTML = `
+        <div class="rest-card">
+          <div class="rest-emoji">😴</div>
+          <div class="rest-title">Día de Descanso</div>
+          <p class="rest-desc">El músculo crece mientras descansas, no mientras entrenas.<br>Estira, camina suave, hidrátate. Vuelves mañana más fuerte.</p>
+        </div>`;
+    } else {
+      let html = `<div class="day-header">
+        <div class="day-title">${day.label}</div>
+        <div class="day-badge ${day.badgeClass}">${day.badge}</div>
+      </div>`;
+
+      day.blocks.forEach((block, bIdx) => {
+        html += `<div class="block">
+          <div class="block-header">
+            <div class="block-icon" style="background:${block.color}">${block.icon}</div>
+            <span class="block-title">${block.title}</span>
+            <span class="block-note">${block.note}</span>
+          </div>`;
+        block.exercises.forEach((ex, eIdx) => {
+          const key = getKey(dIdx, bIdx, eIdx);
+          const done = state[key] ? 'done' : '';
+          html += `<div class="exercise ${done}" id="ex-${key}" onclick="toggleEx('${key}', ${dIdx})">
+            <div class="ex-check">${state[key] ? '✓' : ''}</div>
+            <span class="ex-name">${ex.name}</span>
+            <span class="ex-sets">${ex.sets}</span>
+          </div>`;
+        });
+        html += `</div>`;
+      });
+      div.innerHTML = html;
+    }
+    panelsEl.appendChild(div);
+  });
+}
+
+function toggleEx(key, dayIdx) {
+  const el = document.getElementById(`ex-${key}`);
+  if (state[key]) {
+    delete state[key];
+    el.classList.remove('done');
+    el.querySelector('.ex-check').textContent = '';
+  } else {
+    state[key] = true;
+    el.classList.add('done');
+    el.querySelector('.ex-check').textContent = '✓';
+  }
+  updateProgress(dayIdx);
+}
+
+function updateProgress(dayIdx) {
+  const day = days[dayIdx];
+  if (day.type === 'rest') return;
+  let total = 0, done = 0;
+  day.blocks.forEach((block, bIdx) => {
+    block.exercises.forEach((_, eIdx) => {
+      total++;
+      if (state[getKey(dayIdx, bIdx, eIdx)]) done++;
+    });
+  });
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = pct + '%';
+}
+
+let currentDay = 0;
+function switchDay(idx) {
+  document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(`panel-${idx}`).classList.add('active');
+  document.querySelectorAll('.tab')[idx].classList.add('active');
+  currentDay = idx;
+  updateProgress(idx);
+}
+
+// Timer
+let timerSeconds = 90;
+let timerRunning = false;
+let timerInterval = null;
+let timerDefault = 90;
+
+function setTimer(s) {
+  timerDefault = s;
+  timerSeconds = s;
+  clearInterval(timerInterval);
+  timerRunning = false;
+  document.getElementById('timerToggle').textContent = '▶ Iniciar';
+  updateTimerDisplay();
+}
+
+function toggleTimer() {
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    document.getElementById('timerToggle').textContent = '▶ Reanudar';
+  } else {
+    timerRunning = true;
+    document.getElementById('timerToggle').textContent = '⏸ Pausar';
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      updateTimerDisplay();
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        document.getElementById('timerToggle').textContent = '▶ Iniciar';
+        timerSeconds = timerDefault;
+        updateTimerDisplay();
+        // Flash
+        document.getElementById('timerDisplay').style.color = '#fff';
+        setTimeout(() => document.getElementById('timerDisplay').style.color = 'var(--accent)', 300);
+      }
+    }, 1000);
+  }
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSeconds = timerDefault;
+  document.getElementById('timerToggle').textContent = '▶ Iniciar';
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+  const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+  const s = String(timerSeconds % 60).padStart(2, '0');
+  document.getElementById('timerDisplay').textContent = `${m}:${s}`;
+}
+
+// Week strip
+function buildWeekStrip() {
+  const strip = document.getElementById('weekStrip');
+  const days_names = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const today = new Date();
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - today.getDay() + i);
+    const isToday = d.toDateString() === today.toDateString();
+    const div = document.createElement('div');
+    div.className = 'week-day' + (isToday ? ' today' : '');
+    div.innerHTML = `<div class="wd-name">${days_names[i]}</div><div class="wd-num">${d.getDate()}</div>`;
+    strip.appendChild(div);
+  }
+}
+
+buildWeekStrip();
+renderPanels();
+updateProgress(0);
+</script>
+</body>
+</html>
