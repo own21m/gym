@@ -738,6 +738,30 @@ function buildWeekStrip() {
   }
 }
 
+// Update "Hoy" label to current day
+function updateTodayLabel() {
+  const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  const today = new Date();
+  const todayName = dayNames[today.getDay()];
+  days[0].label = `Hoy — ${todayName}`;
+  
+  // Also update the badge/type based on the actual day's workout
+  const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+  // Map: Sun=rest, Mon=upper, Tue=lower, Wed=upper, Thu=lower, Fri=upper, Sat=lower
+  const dayTypes = ['rest', 'upper', 'lower', 'upper', 'lower', 'upper', 'lower'];
+  const badges = ['Descanso', 'Tren Superior', 'Tren Inferior', 'Tren Superior', 'Tren Inferior', 'Tren Superior', 'Tren Inferior'];
+  const badgeClasses = ['badge-rest', 'badge-upper', 'badge-lower', 'badge-upper', 'badge-lower', 'badge-upper', 'badge-lower'];
+  
+  days[0].type = dayTypes[dayOfWeek];
+  days[0].badge = badges[dayOfWeek];
+  days[0].badgeClass = badgeClasses[dayOfWeek];
+  
+  // Copy the blocks from the corresponding day (Sunday=7, Mon=1, Tue=2, etc.)
+  const correspondingDayIndex = dayOfWeek === 0 ? 7 : dayOfWeek;
+  days[0].blocks = days[correspondingDayIndex].blocks;
+}
+
+updateTodayLabel();
 buildWeekStrip();
 renderPanels();
 updateProgress(0);
